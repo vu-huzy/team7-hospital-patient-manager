@@ -1,0 +1,15 @@
+# Hospital Patient Manager - Python Requirements
+# Database Course Project - Part D
+
+# Core dependencies
+pymysql==1.1.2
+pandas==2.3.0
+matplotlib==3.10.3
+python-dotenv==1.1.0
+
+# Optional - Better visualization
+seaborn==0.13.2
+
+# Web Application (Bonus)
+flask==3.1.2
+
