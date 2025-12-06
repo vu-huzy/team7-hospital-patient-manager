@@ -1,9 +1,6 @@
-code-schema.sql
--- Tạo database
-CREATE DATABASE hospital_manager;
+CREATE DATABASE IF NOT EXISTS hospital_manager;
 USE hospital_manager;
 
--- 1. DEPARTMENT
 CREATE TABLE Department (
     department_id INT AUTO_INCREMENT PRIMARY KEY,
     department_name VARCHAR(100) NOT NULL UNIQUE,
@@ -11,7 +8,6 @@ CREATE TABLE Department (
     head_of_department VARCHAR(100)
 );
 
--- 2. DOCTOR
 CREATE TABLE Doctor (
     doctor_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
@@ -22,7 +18,6 @@ CREATE TABLE Doctor (
     FOREIGN KEY (department_id) REFERENCES Department(department_id)
 );
 
--- 3. PATIENT
 CREATE TABLE Patient (
     patient_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
@@ -35,7 +30,6 @@ CREATE TABLE Patient (
     date_registered DATE DEFAULT (CURRENT_DATE)
 );
 
--- 4. APPOINTMENT
 CREATE TABLE Appointment (
     appointment_id INT AUTO_INCREMENT PRIMARY KEY,
     patient_id INT NOT NULL,
@@ -47,7 +41,6 @@ CREATE TABLE Appointment (
     FOREIGN KEY (doctor_id) REFERENCES Doctor(doctor_id)
 );
 
--- 5. MEDICAL RECORD
 CREATE TABLE Medical_Record (
     record_id INT AUTO_INCREMENT PRIMARY KEY,
     appointment_id INT NOT NULL,
@@ -58,7 +51,6 @@ CREATE TABLE Medical_Record (
     FOREIGN KEY (appointment_id) REFERENCES Appointment(appointment_id)
 );
 
--- 6. BILLING
 CREATE TABLE Billing (
     bill_id INT AUTO_INCREMENT PRIMARY KEY,
     patient_id INT NOT NULL,
@@ -72,7 +64,6 @@ CREATE TABLE Billing (
     FOREIGN KEY (appointment_id) REFERENCES Appointment(appointment_id)
 );
 
--- 7. STAFF
 CREATE TABLE Staff (
     staff_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,

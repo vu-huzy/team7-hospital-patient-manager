@@ -1,13 +1,5 @@
--- =========================================
--- VIEWS, STORED PROCEDURES, AND TRIGGERS
--- =========================================
 USE hospital_manager;
 
--- =========================================
--- 1. VIEWS
--- =========================================
-
--- View: Patient Appointments with details
 DROP VIEW IF EXISTS v_patient_appointments;
 CREATE VIEW v_patient_appointments AS
 SELECT
@@ -26,7 +18,6 @@ JOIN Patient p ON a.patient_id = p.patient_id
 JOIN Doctor d ON a.doctor_id = d.doctor_id
 JOIN Department dept ON d.department_id = dept.department_id;
 
--- View: Department Revenue Summary
 DROP VIEW IF EXISTS v_department_revenue;
 CREATE VIEW v_department_revenue AS
 SELECT
@@ -42,7 +33,6 @@ JOIN Appointment a ON a.doctor_id = d.doctor_id
 JOIN Billing b ON b.appointment_id = a.appointment_id
 GROUP BY dept.department_id, dept.department_name;
 
--- View: Unpaid Bills
 DROP VIEW IF EXISTS v_unpaid_bills;
 CREATE VIEW v_unpaid_bills AS
 SELECT
@@ -67,12 +57,8 @@ JOIN Doctor d ON a.doctor_id = d.doctor_id
 JOIN Department dept ON d.department_id = dept.department_id
 WHERE b.payment_status IN ('Unpaid', 'Partially Paid');
 
--- =========================================
--- 2. STORED PROCEDURES
--- =========================================
 DELIMITER //
 
--- Procedure: Create Appointment
 DROP PROCEDURE IF EXISTS sp_create_appointment //
 CREATE PROCEDURE sp_create_appointment(
     IN p_patient_id INT,
@@ -88,7 +74,6 @@ BEGIN
     SET p_new_appointment_id = LAST_INSERT_ID();
 END //
 
--- Procedure: Monthly Revenue Report by Department
 DROP PROCEDURE IF EXISTS sp_monthly_revenue_by_department //
 CREATE PROCEDURE sp_monthly_revenue_by_department(
     IN p_year INT,
@@ -115,12 +100,8 @@ END //
 
 DELIMITER ;
 
--- =========================================
--- 3. TRIGGERS
--- =========================================
 DELIMITER //
 
--- Trigger: Auto-update payment_status on INSERT
 DROP TRIGGER IF EXISTS trg_billing_set_status_before_ins //
 CREATE TRIGGER trg_billing_set_status_before_ins
 BEFORE INSERT ON Billing
@@ -145,7 +126,6 @@ BEGIN
     END IF;
 END //
 
--- Trigger: Auto-update payment_status on UPDATE
 DROP TRIGGER IF EXISTS trg_billing_set_status_before_upd //
 CREATE TRIGGER trg_billing_set_status_before_upd
 BEFORE UPDATE ON Billing

@@ -1,51 +1,101 @@
-# -*- coding: utf-8 -*-
 import pymysql
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
 import os
-from datetime import datetime
 from dotenv import load_dotenv
 
-# Set UTF-8 encoding for Windows console
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
 
-# Load environment variables
 load_dotenv()
-
-# Create charts directory if it doesn't exist
 os.makedirs('charts', exist_ok=True)
 
-# Database configuration
 DB_CONFIG = {
     'host': os.getenv('DB_HOST', 'localhost'),
     'user': os.getenv('DB_USER', 'root'),
     'password': os.getenv('DB_PASSWORD', ''),
-    'database': os.getenv('DB_NAME', 'hospital_manager'),
     'charset': 'utf8mb4'
 }
+
+def execute_sql_file(cursor, filepath):
+    """Execute SQL statements from a file"""
+    with open(filepath, 'r', encoding='utf-8') as f:
+        sql_content = f.read()
+    
+    statements = sql_content.split(';')
+    for statement in statements:
+        statement = statement.strip()
+        if statement and not statement.startswith('--'):
+            try:
+                cursor.execute(statement)
+            except Exception as e:
+                if 'already exists' not in str(e).lower():
+                    print(f"Warning: {e}")
+
+def init_database():
+    """Initialize database with schema and data"""
+    print("="*80)
+    print("DATABASE INITIALIZATION")
+    print("="*80)
+    
+    try:
+        connection = pymysql.connect(**DB_CONFIG)
+        cursor = connection.cursor()
+        
+        cursor.execute("CREATE DATABASE IF NOT EXISTS hospital_manager")
+        cursor.execute("USE hospital_manager")
+        print("✓ Database created/connected")
+        
+        schema_path = os.path.join('app', 'db', 'schema.sql')
+        seed_path = os.path.join('app', 'db', 'seed.sql')
+        views_path = os.path.join('app', 'db', 'views_procedures.sql')
+        
+        if os.path.exists(schema_path):
+            execute_sql_file(cursor, schema_path)
+            connection.commit()
+            print("✓ Schema loaded")
+        
+        if os.path.exists(seed_path):
+            execute_sql_file(cursor, seed_path)
+            connection.commit()
+            print("✓ Sample data loaded")
+        
+        if os.path.exists(views_path):
+            execute_sql_file(cursor, views_path)
+            connection.commit()
+            print("✓ Views and procedures loaded")
+        
+        cursor.close()
+        connection.close()
+        print("✓ Database initialization complete\n")
+        return True
+        
+    except Exception as e:
+        print(f"✗ Database initialization error: {e}")
+        return False
 
 def get_db_connection():
     """Establish connection to MySQL database"""
     try:
-        connection = pymysql.connect(**DB_CONFIG)
-        print("✓ Successfully connected to MySQL database\n")
+        config = DB_CONFIG.copy()
+        config['database'] = 'hospital_manager'
+        connection = pymysql.connect(**config)
+        print("✓ Connected to database\n")
         return connection
     except pymysql.Error as e:
-        print(f"✗ Error connecting to MySQL: {e}")
+        print(f"✗ Connection error: {e}")
         return None
 
 def close_db_connection(connection):
-    """Close database connection safely"""
+    """Close database connection"""
     if connection:
         connection.close()
-        print("\n✓ Database connection closed")
+        print("\n✓ Connection closed")
 
 def query_view_department_revenue(connection):
-    """Query v_department_revenue view"""
     print("="*80)
-    print("VIEW 1: v_department_revenue - Revenue Summary by Department")
+    print("VIEW 1: Department Revenue Summary")
     print("="*80)
     
     try:
@@ -61,17 +111,14 @@ def query_view_department_revenue(connection):
         print(f"Total Revenue: ${df['total_revenue'].sum():,.2f}")
         print(f"Total Paid: ${df['total_paid'].sum():,.2f}")
         print(f"Outstanding: ${df['total_outstanding'].sum():,.2f}")
-        
         return df
-        
     except Exception as e:
-        print(f"✗ Error querying view: {e}")
+        print(f"✗ Error: {e}")
         return None
 
 def query_view_patient_appointments(connection, limit=10):
-    """Query v_patient_appointments view"""
     print("\n" + "="*80)
-    print("VIEW 2: v_patient_appointments - Recent Patient Appointments")
+    print("VIEW 2: Recent Patient Appointments")
     print("="*80)
     
     try:
@@ -83,18 +130,15 @@ def query_view_patient_appointments(connection, limit=10):
             return None
         
         print(df.to_string(index=False))
-        print(f"\nTotal Appointments Shown: {len(df)}")
-        
+        print(f"\nTotal Appointments: {len(df)}")
         return df
-        
     except Exception as e:
-        print(f"✗ Error querying view: {e}")
+        print(f"✗ Error: {e}")
         return None
 
 def query_view_unpaid_bills(connection):
-    """Query v_unpaid_bills view"""
     print("\n" + "="*80)
-    print("VIEW 3: v_unpaid_bills - Outstanding Bills")
+    print("VIEW 3: Outstanding Bills")
     print("="*80)
     
     try:
@@ -108,24 +152,20 @@ def query_view_unpaid_bills(connection):
         print(df.to_string(index=False))
         print(f"\nTotal Unpaid Bills: {len(df)}")
         print(f"Total Outstanding: ${df['outstanding_amount'].sum():,.2f}")
-        
         return df
-        
     except Exception as e:
-        print(f"✗ Error querying view: {e}")
+        print(f"✗ Error: {e}")
         return None
 
-def call_procedure_monthly_revenue(connection, year=2025, month=1):
-    """Call sp_monthly_revenue_by_department stored procedure"""
+def call_procedure_monthly_revenue(connection, year=2025, month=11):
     print("\n" + "="*80)
-    print(f"PROCEDURE: sp_monthly_revenue_by_department({year}, {month})")
+    print(f"PROCEDURE: Monthly Revenue Report ({month}/{year})")
     print("="*80)
     
     try:
         cursor = connection.cursor()
         cursor.callproc('sp_monthly_revenue_by_department', [year, month])
         
-        # Fetch results with column names
         results = cursor.fetchall()
         columns = [desc[0] for desc in cursor.description]
         df = pd.DataFrame(results, columns=columns)
@@ -137,18 +177,15 @@ def call_procedure_monthly_revenue(connection, year=2025, month=1):
         
         print(df.to_string(index=False))
         print(f"\nTotal Revenue for {month}/{year}: ${df['total_revenue'].sum():,.2f}")
-        
         cursor.close()
         return df
-        
     except Exception as e:
-        print(f"✗ Error calling stored procedure: {e}")
+        print(f"✗ Error: {e}")
         return None
 
 def custom_query_department_stats(connection):
-    """Custom JOIN query: Department statistics"""
     print("\n" + "="*80)
-    print("CUSTOM QUERY 1: Department Statistics (with JOIN)")
+    print("CUSTOM QUERY: Department Statistics")
     print("="*80)
     
     try:
@@ -159,9 +196,9 @@ def custom_query_department_stats(connection):
             COUNT(DISTINCT doc.doctor_id) AS total_doctors,
             COUNT(DISTINCT a.appointment_id) AS total_appointments,
             COUNT(DISTINCT a.patient_id) AS unique_patients,
-            SUM(CASE WHEN a.status = 'Completed' THEN 1 ELSE 0 END) AS completed_appointments,
-            SUM(CASE WHEN a.status = 'Scheduled' THEN 1 ELSE 0 END) AS scheduled_appointments,
-            SUM(CASE WHEN a.status = 'Cancelled' THEN 1 ELSE 0 END) AS cancelled_appointments
+            SUM(CASE WHEN a.status = 'Completed' THEN 1 ELSE 0 END) AS completed,
+            SUM(CASE WHEN a.status = 'Scheduled' THEN 1 ELSE 0 END) AS scheduled,
+            SUM(CASE WHEN a.status = 'Cancelled' THEN 1 ELSE 0 END) AS cancelled
         FROM Department d
         LEFT JOIN Doctor doc ON d.department_id = doc.department_id
         LEFT JOIN Appointment a ON doc.doctor_id = a.doctor_id
@@ -170,24 +207,19 @@ def custom_query_department_stats(connection):
         """
         
         df = pd.read_sql(query, connection)
-        
         if df.empty:
-            print("No department data found.")
+            print("No data found.")
             return None
         
         print(df.to_string(index=False))
-        print(f"\nTotal Departments: {len(df)}")
-        
         return df
-        
     except Exception as e:
-        print(f"✗ Error executing custom query: {e}")
+        print(f"✗ Error: {e}")
         return None
 
 def custom_query_doctor_performance(connection):
-    """Custom query: Doctor performance metrics"""
     print("\n" + "="*80)
-    print("CUSTOM QUERY 2: Doctor Performance Report")
+    print("CUSTOM QUERY: Doctor Performance Report")
     print("="*80)
     
     try:
@@ -211,29 +243,24 @@ def custom_query_doctor_performance(connection):
         """
         
         df = pd.read_sql(query, connection)
-        
         if df.empty:
-            print("No doctor data found.")
+            print("No data found.")
             return None
         
         print(df.to_string(index=False))
-        print(f"\nTotal Doctors: {len(df)}")
-        
         return df
-        
     except Exception as e:
-        print(f"✗ Error executing custom query: {e}")
+        print(f"✗ Error: {e}")
         return None
 
 def visualize_department_revenue(df_revenue):
-    """Create bar chart for department revenue"""
     print("\n" + "="*80)
-    print("VISUALIZATION 1: Department Revenue (Bar Chart)")
+    print("VISUALIZATION: Department Revenue (Bar Chart)")
     print("="*80)
     
     try:
         if df_revenue is None or df_revenue.empty:
-            print("✗ No data available for visualization")
+            print("✗ No data available")
             return
         
         plt.figure(figsize=(12, 6))
@@ -260,21 +287,18 @@ def visualize_department_revenue(df_revenue):
         filename = 'charts/department_revenue.png'
         plt.savefig(filename, dpi=300)
         plt.close()
-        
-        print(f"✓ Chart saved as: {filename}")
-        
+        print(f"✓ Chart saved: {filename}")
     except Exception as e:
-        print(f"✗ Error creating visualization: {e}")
+        print(f"✗ Error: {e}")
 
 def visualize_monthly_revenue_trend(df_procedure):
-    """Create line chart from stored procedure results"""
     print("\n" + "="*80)
-    print("VISUALIZATION 2: Monthly Revenue by Department (Line Chart)")
+    print("VISUALIZATION: Monthly Revenue by Department")
     print("="*80)
     
     try:
         if df_procedure is None or df_procedure.empty:
-            print("✗ No data available for visualization")
+            print("✗ No data available")
             return
         
         plt.figure(figsize=(10, 6))
@@ -295,31 +319,26 @@ def visualize_monthly_revenue_trend(df_procedure):
         filename = 'charts/monthly_revenue_trend.png'
         plt.savefig(filename, dpi=300)
         plt.close()
-        
-        print(f"✓ Chart saved as: {filename}")
-        
+        print(f"✓ Chart saved: {filename}")
     except Exception as e:
-        print(f"✗ Error creating visualization: {e}")
+        print(f"✗ Error: {e}")
 
 def visualize_doctor_performance(df_doctor):
-    """Create horizontal bar chart for doctor performance"""
     print("\n" + "="*80)
-    print("VISUALIZATION 3: Doctor Performance (Horizontal Bar Chart)")
+    print("VISUALIZATION: Top Doctors by Appointments")
     print("="*80)
     
     try:
         if df_doctor is None or df_doctor.empty:
-            print("✗ No data available for visualization")
+            print("✗ No data available")
             return
         
-        # Top 10 doctors by appointments
         df_top = df_doctor.nlargest(10, 'total_appointments')
         
         plt.figure(figsize=(12, 8))
         
         doctors = df_top['doctor_name']
         appointments = df_top['total_appointments']
-        
         colors = plt.cm.viridis(appointments / appointments.max())
         
         plt.barh(doctors, appointments, color=colors)
@@ -332,37 +351,26 @@ def visualize_doctor_performance(df_doctor):
         filename = 'charts/doctor_performance.png'
         plt.savefig(filename, dpi=300)
         plt.close()
-        
-        print(f"✓ Chart saved as: {filename}")
-        
+        print(f"✓ Chart saved: {filename}")
     except Exception as e:
-        print(f"✗ Error creating visualization: {e}")
+        print(f"✗ Error: {e}")
 
 def visualize_appointment_status(connection):
-    """Create pie chart for appointment status distribution"""
     print("\n" + "="*80)
-    print("VISUALIZATION 4: Appointment Status Distribution (Pie Chart)")
+    print("VISUALIZATION: Appointment Status Distribution")
     print("="*80)
     
     try:
-        query = """
-        SELECT 
-            status,
-            COUNT(*) AS count
-        FROM Appointment
-        GROUP BY status
-        """
-        
+        query = "SELECT status, COUNT(*) AS count FROM Appointment GROUP BY status"
         df = pd.read_sql(query, connection)
         
         if df.empty:
-            print("✗ No appointment data found")
+            print("✗ No data found")
             return
         
         plt.figure(figsize=(8, 8))
         
         colors = ['#2ecc71', '#3498db', '#e74c3c']
-        # Dynamic explode based on number of statuses
         explode = [0.1] + [0] * (len(df) - 1)
         
         plt.pie(df['count'], labels=df['status'], autopct='%1.1f%%', 
@@ -373,54 +381,49 @@ def visualize_appointment_status(connection):
         filename = 'charts/appointment_status.png'
         plt.savefig(filename, dpi=300)
         plt.close()
-        
-        print(f"✓ Chart saved as: {filename}")
-        
+        print(f"✓ Chart saved: {filename}")
     except Exception as e:
-        print(f"✗ Error creating visualization: {e}")
+        print(f"✗ Error: {e}")
 
 def main():
-    """Main program execution"""
     print("\n" + "="*80)
-    print("HOSPITAL PATIENT MANAGER - PYTHON PROGRAM")
-    print("Part D: Database Connection, Query Execution, and Visualization")
+    print("HOSPITAL PATIENT MANAGER")
+    print("Database Application with Python & MySQL")
     print("="*80 + "\n")
     
-    # Connect to database
+    if not init_database():
+        print("Database initialization failed. Please check your MySQL connection.")
+        return
+    
     connection = get_db_connection()
     if not connection:
         return
     
     try:
-        # Part 1: Query Views
-        print("\n### PART D.1: QUERYING VIEWS ###\n")
+        print("### QUERYING VIEWS ###\n")
         df_revenue = query_view_department_revenue(connection)
         df_appointments = query_view_patient_appointments(connection, limit=10)
         df_unpaid = query_view_unpaid_bills(connection)
         
-        # Part 2: Call Stored Procedures
-        print("\n\n### PART D.2: CALLING STORED PROCEDURES ###\n")
-        df_monthly = call_procedure_monthly_revenue(connection, year=2025, month=1)
+        print("\n\n### CALLING STORED PROCEDURES ###\n")
+        df_monthly = call_procedure_monthly_revenue(connection, year=2025, month=11)
         
-        # Part 3: Custom SQL Queries
-        print("\n\n### PART D.3: CUSTOM SQL QUERIES ###\n")
+        print("\n\n### CUSTOM SQL QUERIES ###\n")
         df_dept_stats = custom_query_department_stats(connection)
         df_doctor_perf = custom_query_doctor_performance(connection)
         
-        # Part 4: Data Visualizations
-        print("\n\n### PART D.4: DATA VISUALIZATION ###\n")
+        print("\n\n### DATA VISUALIZATION ###\n")
         visualize_department_revenue(df_revenue)
         visualize_monthly_revenue_trend(df_monthly)
         visualize_doctor_performance(df_doctor_perf)
         visualize_appointment_status(connection)
         
         print("\n" + "="*80)
-        print("✓ Program execution completed successfully!")
+        print("✓ Program completed successfully!")
         print("="*80)
         
     except Exception as e:
-        print(f"\n✗ Error during execution: {e}")
-    
+        print(f"\n✗ Error: {e}")
     finally:
         close_db_connection(connection)
 

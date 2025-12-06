@@ -1,21 +1,13 @@
 USE hospital_manager;
 
--- ===========================
--- 1. DEPARTMENT (5 records)
--- ===========================
 INSERT INTO Department (department_name, location, head_of_department)
 VALUES
-('Cardiology', 'Building A', 'Dr. Nguyen Van A'),
-('Neurology', 'Building B', 'Dr. Tran Thi B'),
-('Pediatrics', 'Building C', 'Dr. Le Minh C'),
-('Orthopedics', 'Building D', 'Dr. Pham Van D'),
-('Dermatology', 'Building E', 'Dr. Hoang Thi E');
+('Cardiology', 'Building A', 'Dr. Nguyen Van Hoang'),
+('Neurology', 'Building B', 'Dr. Tran Thi Minh'),
+('Pediatrics', 'Building C', 'Dr. Le Minh Duc'),
+('Orthopedics', 'Building D', 'Dr. Pham Van Thanh'),
+('Dermatology', 'Building E', 'Dr. Hoang Thi Lan');
 
-
-
--- ===========================
--- 2. DOCTOR (10 records)
--- ===========================
 INSERT INTO Doctor (full_name, specialization, phone_number, email, department_id)
 VALUES
 ('Dr. Nguyen Quang Anh', 'Cardiology', '0905111222', 'anh.nguyen@hospital.com', 1),
@@ -55,13 +47,15 @@ VALUES
 ('Tran Van Q', 'Male', '1989-03-30', '0912000017', 'q.tran@mail.com', 'Hai Phong', '0903000017'),
 ('Le Thi R', 'Female', '1996-04-27', '0912000018', 'r.le@mail.com', 'Phu Tho', '0903000018'),
 ('Hoang Van S', 'Male', '1983-09-09', '0912000019', 's.hoang@mail.com', 'Ha Nam', '0903000019'),
-('Pham Thi T', 'Female', '2001-11-11', '0912000020', 't.pham@mail.com', 'Ha Noi', '0903000020');
+('Pham Thi T', 'Female', '2001-11-11', '0912000020', 't.pham@mail.com', 'Ha Noi', '0903000020'),
+('Vo Minh Tuan', 'Male', '1992-05-15', '0912000021', 'tuan.vo@mail.com', '67 Ly Thuong Kiet, Ha Noi', '0903000021'),
+('Dang Thi Uyen', 'Female', '1995-08-22', '0912000022', 'uyen.dang@mail.com', '89 Nguyen Trai, Ha Noi', '0903000022'),
+('Bui Van Vinh', 'Male', '1988-12-30', '0912000023', 'vinh.bui@mail.com', '12 Phan Dinh Phung, Hai Phong', '0903000023'),
+('Ngo Thi Xuan', 'Female', '1991-06-18', '0912000024', 'xuan.ngo@mail.com', '34 Dien Bien Phu, Da Nang', '0903000024'),
+('Dinh Van Yen', 'Male', '1986-03-25', '0912000025', 'yen.dinh@mail.com', '56 Tay Son, Ha Noi', '0903000025');
 
-
-
--- ===========================
--- 4. APPOINTMENT (30 records)
--- ===========================
+INSERT INTO Appointment (patient_id, doctor_id, appointment_date, reason, status)
+VALUES
 INSERT INTO Appointment (patient_id, doctor_id, appointment_date, reason, status)
 VALUES
 (1, 1, '2025-01-05 09:00:00', 'Chest pain', 'Completed'),
@@ -93,13 +87,74 @@ VALUES
 (14, 8, '2025-01-25 09:30:00', 'Back issue', 'Completed'),
 (16, 7, '2025-01-25 11:00:00', 'Pain relief', 'Completed'),
 (18, 5, '2025-01-25 13:30:00', 'Cough fever', 'Completed'),
-(20, 3, '2025-01-25 14:30:00', 'Head pain', 'Completed');
+(20, 3, '2025-01-25 14:30:00', 'Head pain', 'Completed'),
+(1, 1, '2025-11-01 09:00:00', 'Chest pain consultation', 'Completed'),
+(2, 1, '2025-11-01 10:30:00', 'Heart checkup', 'Completed'),
+(3, 2, '2025-11-02 09:00:00', 'Follow-up cardiology', 'Completed'),
+(4, 3, '2025-11-02 14:00:00', 'Severe headache', 'Completed'),
+(5, 3, '2025-11-03 10:00:00', 'Migraine treatment', 'Completed'),
+(6, 4, '2025-11-03 15:00:00', 'Nerve pain assessment', 'Completed'),
+(7, 5, '2025-11-04 08:30:00', 'Child fever', 'Completed'),
+(8, 5, '2025-11-04 11:00:00', 'Cough and cold', 'Completed'),
+(9, 6, '2025-11-05 09:30:00', 'Pediatric checkup', 'Completed'),
+(10, 6, '2025-11-05 14:00:00', 'Vaccination', 'Completed'),
+(11, 7, '2025-11-06 10:00:00', 'Bone fracture', 'Completed'),
+(12, 7, '2025-11-06 13:30:00', 'Joint inflammation', 'Completed'),
+(13, 8, '2025-11-07 09:00:00', 'Back pain', 'Completed'),
+(14, 8, '2025-11-07 15:00:00', 'Neck sprain', 'Completed'),
+(15, 9, '2025-11-08 10:30:00', 'Skin rash', 'Completed'),
+(16, 9, '2025-11-08 14:30:00', 'Allergic reaction', 'Completed'),
+(17, 10, '2025-11-09 09:00:00', 'Dermatitis treatment', 'Completed'),
+(18, 10, '2025-11-09 11:00:00', 'Acne consultation', 'Completed'),
+(19, 1, '2025-11-10 10:00:00', 'Heart monitoring', 'Completed'),
+(20, 1, '2025-11-11 09:30:00', 'Shortness of breath', 'Completed'),
+(2, 2, '2025-11-11 14:00:00', 'High blood pressure', 'Completed'),
+(3, 4, '2025-11-12 10:00:00', 'Numbness in limbs', 'Completed'),
+(5, 6, '2025-11-12 15:30:00', 'Child consultation', 'Completed'),
+(8, 7, '2025-11-13 09:00:00', 'Sports injury', 'Completed'),
+(10, 9, '2025-11-13 13:00:00', 'Skin examination', 'Completed'),
+(12, 10, '2025-11-14 10:30:00', 'Allergy testing', 'Completed'),
+(14, 8, '2025-11-14 14:00:00', 'Back therapy', 'Completed'),
+(16, 7, '2025-11-15 09:30:00', 'Pain management', 'Completed'),
+(18, 5, '2025-11-15 11:30:00', 'Respiratory issue', 'Completed'),
+(20, 3, '2025-11-16 10:00:00', 'Neurological exam', 'Completed'),
+(21, 1, '2025-11-16 14:30:00', 'Cardiac stress test', 'Completed'),
+(22, 2, '2025-11-17 09:00:00', 'Chest pain', 'Completed'),
+(23, 3, '2025-11-17 13:00:00', 'Dizziness', 'Completed'),
+(24, 4, '2025-11-18 10:30:00', 'Sleep disorder', 'Completed'),
+(25, 5, '2025-11-18 15:00:00', 'Child wellness', 'Completed'),
+(1, 6, '2025-11-19 09:00:00', 'Immunization', 'Completed'),
+(4, 7, '2025-11-19 14:00:00', 'Knee pain', 'Completed'),
+(6, 8, '2025-11-20 10:00:00', 'Spinal check', 'Completed'),
+(9, 9, '2025-11-20 13:30:00', 'Eczema', 'Completed'),
+(11, 10, '2025-11-21 09:30:00', 'Psoriasis', 'Completed'),
+(13, 1, '2025-11-21 14:00:00', 'Arrhythmia', 'Completed'),
+(15, 2, '2025-11-22 10:00:00', 'Hypertension', 'Completed'),
+(17, 3, '2025-11-22 15:00:00', 'Seizure history', 'Completed'),
+(19, 4, '2025-11-23 09:00:00', 'Memory issues', 'Completed'),
+(21, 5, '2025-11-23 11:30:00', 'Asthma', 'Completed'),
+(22, 6, '2025-11-24 10:00:00', 'Growth monitoring', 'Completed'),
+(23, 7, '2025-11-24 14:30:00', 'Arthritis', 'Completed'),
+(24, 8, '2025-11-25 09:00:00', 'Posture correction', 'Completed'),
+(25, 9, '2025-11-25 13:00:00', 'Skin cancer screening', 'Completed'),
+(1, 10, '2025-11-26 10:30:00', 'Wart removal', 'Completed'),
+(2, 1, '2025-11-26 15:00:00', 'Pacemaker checkup', 'Completed'),
+(3, 2, '2025-11-27 09:30:00', 'Cholesterol test', 'Completed'),
+(4, 3, '2025-11-27 14:00:00', 'Parkinson screening', 'Completed'),
+(5, 4, '2025-11-28 10:00:00', 'Neuropathy', 'Completed'),
+(6, 5, '2025-11-28 13:30:00', 'Flu symptoms', 'Completed'),
+(7, 6, '2025-11-29 09:00:00', 'Developmental check', 'Completed'),
+(8, 7, '2025-11-29 11:30:00', 'Hip replacement follow-up', 'Completed'),
+(9, 8, '2025-11-30 10:00:00', 'Scoliosis evaluation', 'Completed'),
+(10, 9, '2025-11-30 14:00:00', 'Mole examination', 'Completed'),
+(11, 10, '2025-12-01 09:30:00', 'Hair loss treatment', 'Scheduled'),
+(12, 1, '2025-12-02 10:00:00', 'Annual cardiac exam', 'Scheduled'),
+(13, 2, '2025-12-03 14:30:00', 'ECG test', 'Scheduled'),
+(14, 3, '2025-12-04 09:00:00', 'Brain MRI follow-up', 'Scheduled'),
+(15, 4, '2025-12-05 11:00:00', 'Vertigo treatment', 'Scheduled');
 
-
-
--- ===========================
--- 5. MEDICAL RECORD (20 records)
--- ===========================
+INSERT INTO Medical_Record (appointment_id, diagnosis, prescription, treatment_notes, follow_up_date)
+VALUES
 INSERT INTO Medical_Record (appointment_id, diagnosis, prescription, treatment_notes, follow_up_date)
 VALUES
 (1, 'Chest pain', 'Paracetamol', 'Rest 3 days', '2025-01-12'),
@@ -121,13 +176,55 @@ VALUES
 (17, 'Dermatitis', 'Topical cream', 'Avoid chemicals', '2025-02-08'),
 (18, 'Acne', 'Acne gel', 'Wash face daily', '2025-02-09'),
 (19, 'Heart recheck', 'Aspirin', 'Healthy diet', '2025-02-10'),
-(20, 'Short breath', 'Spray', 'Breathing exercise', '2025-02-11');
+(20, 'Short breath', 'Spray', 'Breathing exercise', '2025-02-11'),
+(31, 'Angina pectoris', 'Nitroglycerin', 'Rest and reduce stress', '2025-11-15'),
+(32, 'Normal cardiac function', 'Aspirin 100mg', 'Continue healthy lifestyle', '2025-12-01'),
+(33, 'Mild arrhythmia', 'Beta blockers', 'Monitor heart rate daily', '2025-11-18'),
+(34, 'Tension headache', 'Ibuprofen 400mg', 'Adequate hydration', '2025-11-16'),
+(35, 'Chronic migraine', 'Sumatriptan', 'Avoid trigger foods', '2025-11-20'),
+(36, 'Peripheral neuropathy', 'Vitamin B12, Gabapentin', 'Physical therapy', '2025-11-21'),
+(37, 'Viral fever', 'Paracetamol syrup', 'Rest for 3 days', '2025-11-11'),
+(38, 'Upper respiratory infection', 'Amoxicillin', 'Keep warm, plenty of fluids', '2025-11-12'),
+(39, 'Healthy development', 'Multivitamins', 'Normal growth pattern', '2025-12-05'),
+(40, 'Vaccination complete', 'None', 'No adverse reactions', NULL),
+(41, 'Tibial fracture', 'Pain medication, Cast', '6 weeks immobilization', '2025-11-20'),
+(42, 'Rheumatoid arthritis', 'Methotrexate', 'Anti-inflammatory diet', '2025-11-27'),
+(43, 'Lumbar strain', 'Muscle relaxants', 'Avoid heavy lifting', '2025-11-21'),
+(44, 'Cervical sprain', 'NSAIDs, Neck collar', 'Rest and ice therapy', '2025-11-22'),
+(45, 'Contact dermatitis', 'Hydrocortisone cream', 'Avoid allergens', '2025-11-22'),
+(46, 'Urticaria', 'Antihistamine', 'Identify trigger', '2025-11-23'),
+(47, 'Atopic dermatitis', 'Topical corticosteroids', 'Moisturize regularly', '2025-11-24'),
+(48, 'Acne vulgaris', 'Benzoyl peroxide gel', 'Gentle face cleansing', '2025-12-09'),
+(49, 'Stable angina', 'Aspirin, Statin', 'Regular exercise', '2025-12-10'),
+(50, 'Dyspnea', 'Bronchodilator inhaler', 'Breathing exercises', '2025-11-25'),
+(51, 'Hypertension stage 2', 'ACE inhibitors', 'Low sodium diet', '2025-12-11'),
+(52, 'Carpal tunnel syndrome', 'Wrist splint', 'Occupational therapy', '2025-11-26'),
+(53, 'Well child visit', 'Vitamin D drops', 'Age-appropriate development', '2025-12-12'),
+(54, 'Sports-related contusion', 'Ice, Compression', 'RICE protocol', '2025-11-20'),
+(55, 'Seborrheic keratosis', 'Observation', 'Benign lesion', NULL),
+(56, 'Seasonal allergies', 'Cetirizine', 'Nasal spray', '2025-11-28'),
+(57, 'Muscle spasm', 'Cyclobenzaprine', 'Heat therapy', '2025-11-28'),
+(58, 'Chronic pain syndrome', 'Tramadol', 'Pain management program', '2025-12-15'),
+(59, 'Bronchitis', 'Cough suppressant', 'Humidifier use', '2025-11-29'),
+(60, 'Peripheral vertigo', 'Meclizine', 'Vestibular exercises', '2025-11-30'),
+(61, 'Coronary artery disease', 'Clopidogrel, Statin', 'Cardiac rehabilitation', '2025-12-16'),
+(62, 'Stable angina', 'Long-acting nitrates', 'Stress management', '2025-12-17'),
+(63, 'Benign positional vertigo', 'Epley maneuver', 'Head positioning', '2025-12-01'),
+(64, 'Restless leg syndrome', 'Ropinirole', 'Iron supplementation', '2025-12-02'),
+(65, 'Pediatric obesity', 'Dietary counseling', 'Exercise program', '2025-12-18'),
+(66, 'DTaP booster', 'None', 'Normal reaction expected', NULL),
+(67, 'Osteoarthritis', 'Glucosamine', 'Weight management', '2025-12-03'),
+(68, 'Herniated disc', 'Epidural injection', 'Physical therapy', '2025-12-04'),
+(69, 'Eczema flare', 'Tacrolimus ointment', 'Avoid irritants', '2025-12-05'),
+(70, 'Plaque psoriasis', 'Phototherapy', 'Vitamin D analog', '2025-12-06'),
+(71, 'Atrial fibrillation', 'Warfarin, Metoprolol', 'INR monitoring', '2025-12-21'),
+(72, 'Essential hypertension', 'Amlodipine', 'Home BP monitoring', '2025-12-22'),
+(73, 'Post-seizure evaluation', 'Levetiracetam adjustment', 'EEG scheduled', '2025-12-23'),
+(74, 'Mild cognitive impairment', 'Donepezil', 'Cognitive exercises', '2025-12-24'),
+(75, 'Asthma exacerbation', 'Prednisone, Albuterol', 'Peak flow monitoring', '2025-12-07');
 
-
-
--- ===========================
--- 6. BILLING (30 records)
--- ===========================
+INSERT INTO Billing (patient_id, appointment_id, amount_due, amount_paid, payment_date, payment_status, payment_method)
+VALUES
 INSERT INTO Billing (patient_id, appointment_id, amount_due, amount_paid, payment_date, payment_status, payment_method)
 VALUES
 (1, 1, 300000, 300000, '2025-01-05', 'Paid', 'cash'),
@@ -159,17 +256,59 @@ VALUES
 (14, 27, 200000, 200000, '2025-01-25', 'Paid', 'cash'),
 (16, 28, 240000, 240000, '2025-01-25', 'Paid', 'card'),
 (18, 29, 170000, 170000, '2025-01-25', 'Paid', 'cash'),
-(20, 30, 250000, 250000, '2025-01-25', 'Paid', 'insurance');
+(20, 30, 250000, 250000, '2025-01-25', 'Paid', 'insurance'),
+(1, 31, 350000, 350000, '2025-11-01', 'Paid', 'cash'),
+(2, 32, 300000, 300000, '2025-11-01', 'Paid', 'card'),
+(3, 33, 280000, 280000, '2025-11-02', 'Paid', 'insurance'),
+(4, 34, 250000, 250000, '2025-11-02', 'Paid', 'card'),
+(5, 35, 270000, 200000, '2025-11-03', 'Partially Paid', 'cash'),
+(6, 36, 320000, 320000, '2025-11-03', 'Paid', 'insurance'),
+(7, 37, 180000, 180000, '2025-11-04', 'Paid', 'card'),
+(8, 38, 200000, 200000, '2025-11-04', 'Paid', 'cash'),
+(9, 39, 150000, 150000, '2025-11-05', 'Paid', 'cash'),
+(10, 40, 100000, 100000, '2025-11-05', 'Paid', 'insurance'),
+(11, 41, 450000, 450000, '2025-11-06', 'Paid', 'card'),
+(12, 42, 380000, 300000, '2025-11-06', 'Partially Paid', 'cash'),
+(13, 43, 290000, 290000, '2025-11-07', 'Paid', 'insurance'),
+(14, 44, 260000, 260000, '2025-11-07', 'Paid', 'card'),
+(15, 45, 240000, 240000, '2025-11-08', 'Paid', 'cash'),
+(16, 46, 220000, 220000, '2025-11-08', 'Paid', 'cash'),
+(17, 47, 250000, 250000, '2025-11-09', 'Paid', 'insurance'),
+(18, 48, 180000, 180000, '2025-11-09', 'Paid', 'card'),
+(19, 49, 340000, 340000, '2025-11-10', 'Paid', 'cash'),
+(20, 50, 310000, 310000, '2025-11-11', 'Paid', 'card'),
+(2, 51, 280000, 280000, '2025-11-11', 'Paid', 'insurance'),
+(3, 52, 300000, 0, NULL, 'Unpaid', 'cash'),
+(5, 53, 190000, 190000, '2025-11-12', 'Paid', 'cash'),
+(8, 54, 230000, 230000, '2025-11-13', 'Paid', 'card'),
+(10, 55, 210000, 150000, '2025-11-13', 'Partially Paid', 'cash'),
+(12, 56, 270000, 270000, '2025-11-14', 'Paid', 'insurance'),
+(14, 57, 240000, 240000, '2025-11-14', 'Paid', 'card'),
+(16, 58, 260000, 260000, '2025-11-15', 'Paid', 'cash'),
+(18, 59, 190000, 190000, '2025-11-15', 'Paid', 'cash'),
+(20, 60, 270000, 270000, '2025-11-16', 'Paid', 'insurance'),
+(21, 61, 400000, 400000, '2025-11-16', 'Paid', 'card'),
+(22, 62, 330000, 330000, '2025-11-17', 'Paid', 'cash'),
+(23, 63, 280000, 280000, '2025-11-17', 'Paid', 'insurance'),
+(24, 64, 290000, 200000, '2025-11-18', 'Partially Paid', 'card'),
+(25, 65, 160000, 160000, '2025-11-18', 'Paid', 'cash'),
+(1, 66, 120000, 120000, '2025-11-19', 'Paid', 'insurance'),
+(4, 67, 320000, 0, NULL, 'Unpaid', 'cash'),
+(6, 68, 350000, 350000, '2025-11-20', 'Paid', 'card'),
+(9, 69, 230000, 230000, '2025-11-20', 'Paid', 'cash'),
+(11, 70, 280000, 280000, '2025-11-21', 'Paid', 'insurance'),
+(13, 71, 380000, 380000, '2025-11-21', 'Paid', 'card'),
+(15, 72, 270000, 270000, '2025-11-22', 'Paid', 'cash'),
+(17, 73, 340000, 340000, '2025-11-22', 'Paid', 'insurance'),
+(19, 74, 310000, 310000, '2025-11-23', 'Paid', 'card'),
+(21, 75, 250000, 250000, '2025-11-23', 'Paid', 'cash');
 
-
-
--- ===========================
--- 7. STAFF (5 records)
--- ===========================
+INSERT INTO Staff (full_name, position, phone_number, email, assigned_department)
+VALUES
 INSERT INTO Staff (full_name, position, phone_number, email, assigned_department)
 VALUES
 ('Nguyen Thanh Hai', 'Receptionist', '0912333000', 'hai.nguyen@hospital.com', 1),
-('Tran Thi Minh', 'Nurse', '0912333111', 'minh.tran@hospital.com', 2),
+('Tran Thi Minh Chau', 'Nurse', '0912333111', 'chau.tran@hospital.com', 2),
 ('Pham Quoc Bao', 'Cashier', '0912333222', 'bao.pham@hospital.com', 3),
-('Hoang Anh Kiet', 'Admin', '0912333333', 'kiet.hoang@hospital.com', 4),
-('Le Thi Kim', 'Manager', '0912333444', 'kim.le@hospital.com', 5);
+('Hoang Anh Kiet', 'Administrator', '0912333333', 'kiet.hoang@hospital.com', 4),
+('Le Thi Kim Anh', 'Department Manager', '0912333444', 'kimanh.le@hospital.com', 5);
