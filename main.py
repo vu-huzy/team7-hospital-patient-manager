@@ -19,19 +19,67 @@ DB_CONFIG = {
 }
 
 def execute_sql_file(cursor, filepath):
-    """Execute SQL statements from a file"""
+    """Execute SQL statements from a file (handles DELIMITER blocks)"""
     with open(filepath, 'r', encoding='utf-8') as f:
-        sql_content = f.read()
+        lines = f.readlines()
     
-    statements = sql_content.split(';')
-    for statement in statements:
-        statement = statement.strip()
-        if statement and not statement.startswith('--'):
-            try:
-                cursor.execute(statement)
-            except Exception as e:
-                if 'already exists' not in str(e).lower():
-                    print(f"Warning: {e}")
+    delimiter = ';'
+    buffer = []
+    in_comment = False
+    
+    def execute_stmt(stmt_text):
+        """Helper to execute a single statement with error handling"""
+        if not stmt_text or stmt_text.startswith('--'):
+            return
+        try:
+            cursor.execute(stmt_text)
+        except Exception as e:
+            err_msg = str(e).lower()
+            if 'duplicate entry' not in err_msg and 'already exists' not in err_msg:
+                print(f"Warning: {e}")
+    
+    for line in lines:
+        stripped = line.strip()
+        
+        # Handle multi-line comments
+        if '/*' in stripped:
+            in_comment = True
+        if in_comment:
+            if '*/' in stripped:
+                in_comment = False
+            continue
+        
+        # Handle DELIMITER directive
+        if stripped.upper().startswith('DELIMITER '):
+            # Flush buffer before changing delimiter
+            if buffer:
+                stmt = ''.join(buffer).strip()
+                if delimiter and stmt.endswith(delimiter):
+                    stmt = stmt[:-len(delimiter)].strip()
+                execute_stmt(stmt)
+                buffer = []
+            delimiter = stripped.split()[1] if len(stripped.split()) > 1 else ';'
+            continue
+        
+        # Skip empty lines and comments
+        if not stripped or stripped.startswith('--'):
+            continue
+        
+        buffer.append(line)
+        
+        # Check if statement ends with current delimiter
+        joined = ''.join(buffer).rstrip()
+        if delimiter and joined.endswith(delimiter):
+            stmt = joined[:-len(delimiter)].strip()
+            execute_stmt(stmt)
+            buffer = []
+    
+    # Execute remaining buffer
+    if buffer:
+        stmt = ''.join(buffer).strip()
+        if delimiter and stmt.endswith(delimiter):
+            stmt = stmt[:-len(delimiter)].strip()
+        execute_stmt(stmt)
 
 def init_database():
     """Initialize database with schema and data"""

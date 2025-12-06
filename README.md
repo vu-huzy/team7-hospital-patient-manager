@@ -42,13 +42,13 @@ hospital-patient-manager/
     ui/                       # Flask web interface
        templates/            # HTML templates
        static/               # CSS, JavaScript
-    main.py                   # Main Python program
 
  charts/                       # Auto-generated visualizations
  docs/                         # Report and slides
  .env                          # Configuration (not in Git)
  requirements.txt              # Python dependencies
- run.py                        # Flask app entry point
+ main.py                       # Main Python program (data analysis)
+ run_web.py                    # Flask web app entry point
 ```
 
 ## Quick Start
@@ -64,23 +64,7 @@ hospital-patient-manager/
 pip install -r requirements.txt
 ```
 
-### 3. Setup Database
-
-```bash
-# Login to MySQL
-mysql -u root -p
-
-# Create database
-CREATE DATABASE hospital_manager;
-exit;
-
-# Import SQL files
-mysql -u root -p hospital_manager < app/db/schema.sql
-mysql -u root -p hospital_manager < app/db/seed.sql
-mysql -u root -p hospital_manager < app/db/views_procedures.sql
-```
-or just run the sql file in folder db
-### 4. Configure Environment
+### 3. Configure Environment
 
 Create .env file bu .env.examples ( please to use your password )
 
@@ -94,11 +78,11 @@ FLASK_ENV=development
 SECRET_KEY=your-secret-key
 ```
 
-### 5. Run Application
+### 4. Run Application
 
-**Python Program:**
+**Python Program (Data Analysis & Charts):**
 ```bash
-python app/main.py
+python main.py
 ```
 
 **Output:**
@@ -111,13 +95,13 @@ python app/main.py
 
 **Web Interface:**
 ```bash
-python run.py
+python run_web.py
 ```
 Then open the web link that on your cmd screen.
 
 ## Web Application (Flask)
 
-**Files:** `run.py`, `app/ui/`
+**Files:** `run_web.py`, `app/ui/`
 
 ### Features
 

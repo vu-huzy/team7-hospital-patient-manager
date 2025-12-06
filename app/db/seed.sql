@@ -56,8 +56,6 @@ VALUES
 
 INSERT INTO Appointment (patient_id, doctor_id, appointment_date, reason, status)
 VALUES
-INSERT INTO Appointment (patient_id, doctor_id, appointment_date, reason, status)
-VALUES
 (1, 1, '2025-01-05 09:00:00', 'Chest pain', 'Completed'),
 (2, 1, '2025-01-06 10:00:00', 'Heart checkup', 'Completed'),
 (3, 2, '2025-01-07 11:00:00', 'Cardio recheck', 'Completed'),
@@ -155,8 +153,6 @@ VALUES
 
 INSERT INTO Medical_Record (appointment_id, diagnosis, prescription, treatment_notes, follow_up_date)
 VALUES
-INSERT INTO Medical_Record (appointment_id, diagnosis, prescription, treatment_notes, follow_up_date)
-VALUES
 (1, 'Chest pain', 'Paracetamol', 'Rest 3 days', '2025-01-12'),
 (2, 'Heart checkup', 'Aspirin', 'Avoid stress', '2025-01-14'),
 (3, 'Cardio issue', 'Beta blockers', 'Monitor heart rate', '2025-01-15'),
@@ -221,10 +217,18 @@ VALUES
 (72, 'Essential hypertension', 'Amlodipine', 'Home BP monitoring', '2025-12-22'),
 (73, 'Post-seizure evaluation', 'Levetiracetam adjustment', 'EEG scheduled', '2025-12-23'),
 (74, 'Mild cognitive impairment', 'Donepezil', 'Cognitive exercises', '2025-12-24'),
-(75, 'Asthma exacerbation', 'Prednisone, Albuterol', 'Peak flow monitoring', '2025-12-07');
+(75, 'Asthma exacerbation', 'Prednisone, Albuterol', 'Peak flow monitoring', '2025-12-07'),
+(76, 'Well child visit', 'Multivitamin', 'Normal development', '2025-12-24'),
+(77, 'Degenerative joint disease', 'Celecoxib', 'Low-impact exercise', '2025-12-25'),
+(78, 'Postural hypotension', 'Midodrine', 'Increase fluid intake', '2025-12-25'),
+(79, 'Contact dermatitis', 'Betamethasone cream', 'Avoid nickel jewelry', '2025-12-26'),
+(80, 'Fungal infection', 'Clotrimazole', 'Keep area dry', '2025-12-07'),
+(81, 'Cellulitis', 'Cephalexin', 'Elevation, rest', '2025-12-08'),
+(82, 'Mitral valve prolapse', 'Beta blocker', 'Endocarditis prophylaxis', '2025-12-27'),
+(83, 'Carotid stenosis', 'Aspirin, Atorvastatin', 'Vascular surgery consult', '2025-12-28'),
+(84, 'Alzheimer disease', 'Memantine', 'Caregiver support', '2025-12-29'),
+(85, 'Diabetic neuropathy', 'Pregabalin', 'Blood sugar control', '2025-12-09');
 
-INSERT INTO Billing (patient_id, appointment_id, amount_due, amount_paid, payment_date, payment_status, payment_method)
-VALUES
 INSERT INTO Billing (patient_id, appointment_id, amount_due, amount_paid, payment_date, payment_status, payment_method)
 VALUES
 (1, 1, 300000, 300000, '2025-01-05', 'Paid', 'cash'),
@@ -301,10 +305,22 @@ VALUES
 (15, 72, 270000, 270000, '2025-11-22', 'Paid', 'cash'),
 (17, 73, 340000, 340000, '2025-11-22', 'Paid', 'insurance'),
 (19, 74, 310000, 310000, '2025-11-23', 'Paid', 'card'),
-(21, 75, 250000, 250000, '2025-11-23', 'Paid', 'cash');
+(21, 75, 250000, 250000, '2025-11-23', 'Paid', 'cash'),
+(22, 76, 140000, 140000, '2025-11-24', 'Paid', 'insurance'),
+(23, 77, 420000, 420000, '2025-11-24', 'Paid', 'card'),
+(24, 78, 290000, 290000, '2025-11-25', 'Paid', 'cash'),
+(25, 79, 200000, 200000, '2025-11-25', 'Paid', 'insurance'),
+(1, 80, 180000, 180000, '2025-11-26', 'Paid', 'card'),
+(2, 81, 360000, 360000, '2025-11-26', 'Paid', 'cash'),
+(3, 82, 380000, 380000, '2025-11-27', 'Paid', 'insurance'),
+(4, 83, 450000, 450000, '2025-11-27', 'Paid', 'card'),
+(5, 84, 520000, 520000, '2025-11-28', 'Paid', 'cash'),
+(6, 85, 310000, 310000, '2025-11-28', 'Paid', 'insurance'),
+(7, 86, 180000, 180000, '2025-11-29', 'Paid', 'cash'),
+(8, 87, 390000, 390000, '2025-11-29', 'Paid', 'insurance'),
+(9, 88, 340000, 340000, '2025-11-30', 'Paid', 'card'),
+(10, 89, 210000, 210000, '2025-11-30', 'Paid', 'cash');
 
-INSERT INTO Staff (full_name, position, phone_number, email, assigned_department)
-VALUES
 INSERT INTO Staff (full_name, position, phone_number, email, assigned_department)
 VALUES
 ('Nguyen Thanh Hai', 'Receptionist', '0912333000', 'hai.nguyen@hospital.com', 1),

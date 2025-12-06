@@ -24,8 +24,8 @@ SELECT
     dept.department_id,
     dept.department_name,
     COUNT(DISTINCT a.appointment_id) AS total_appointments,
-    SUM(b.amount_due) AS total_amount_due,
-    SUM(b.amount_paid) AS total_amount_paid,
+    SUM(b.amount_due) AS total_revenue,
+    SUM(b.amount_paid) AS total_paid,
     SUM(b.amount_due - b.amount_paid) AS total_outstanding
 FROM Department dept
 JOIN Doctor d ON d.department_id = dept.department_id
@@ -43,7 +43,7 @@ SELECT
     a.appointment_date,
     b.amount_due,
     b.amount_paid,
-    (b.amount_due - b.amount_paid) AS amount_outstanding,
+    (b.amount_due - b.amount_paid) AS outstanding_amount,
     b.payment_status,
     b.payment_method,
     d.doctor_id,
@@ -83,19 +83,18 @@ BEGIN
     SELECT
         dept.department_id,
         dept.department_name,
-        COUNT(DISTINCT a.appointment_id) AS total_appointments,
-        SUM(b.amount_due) AS total_amount_due,
-        SUM(b.amount_paid) AS total_amount_paid,
-        SUM(b.amount_due - b.amount_paid) AS total_outstanding
+        COUNT(DISTINCT a.appointment_id) AS appointments_count,
+        SUM(b.amount_due) AS total_revenue,
+        SUM(b.amount_paid) AS total_paid,
+        SUM(b.amount_due - b.amount_paid) AS outstanding_amount
     FROM Department dept
     JOIN Doctor d ON d.department_id = dept.department_id
     JOIN Appointment a ON a.doctor_id = d.doctor_id
     JOIN Billing b ON b.appointment_id = a.appointment_id
-    WHERE b.payment_date IS NOT NULL
-      AND YEAR(b.payment_date) = p_year
-      AND MONTH(b.payment_date) = p_month
+    WHERE YEAR(a.appointment_date) = p_year
+      AND MONTH(a.appointment_date) = p_month
     GROUP BY dept.department_id, dept.department_name
-    ORDER BY total_amount_paid DESC;
+    ORDER BY total_revenue DESC;
 END //
 
 DELIMITER ;
