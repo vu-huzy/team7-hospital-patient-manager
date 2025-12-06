@@ -433,6 +433,129 @@ def visualize_appointment_status(connection):
     except Exception as e:
         print(f"✗ Error: {e}")
 
+def test_triggers(connection):
+    """Test billing triggers (auto-update payment_status)"""
+    print("\n" + "="*80)
+    print("TRIGGER TEST: Auto-update Payment Status")
+    print("="*80)
+    
+    try:
+        cursor = connection.cursor()
+        
+        # Test 1: Insert new billing record with full payment
+        print("\n1. Testing INSERT trigger (Full Payment):")
+        cursor.execute("""
+            INSERT INTO Billing (patient_id, appointment_id, amount_due, amount_paid, payment_method)
+            VALUES (1, 90, 500000, 500000, 'cash')
+        """)
+        connection.commit()
+        
+        cursor.execute("SELECT bill_id, amount_due, amount_paid, payment_status, payment_date FROM Billing WHERE appointment_id = 90")
+        result = cursor.fetchone()
+        if result:
+            print(f"   Bill ID: {result[0]}, Amount Due: {result[1]}, Amount Paid: {result[2]}")
+            print(f"   → Payment Status: {result[3]} (Expected: Paid)")
+            print(f"   → Payment Date: {result[4]} (Auto-set by trigger)")
+        
+        # Test 2: Update billing record to partial payment
+        print("\n2. Testing UPDATE trigger (Partial Payment):")
+        cursor.execute("""
+            UPDATE Billing 
+            SET amount_paid = 250000 
+            WHERE appointment_id = 90
+        """)
+        connection.commit()
+        
+        cursor.execute("SELECT amount_due, amount_paid, payment_status FROM Billing WHERE appointment_id = 90")
+        result = cursor.fetchone()
+        if result:
+            print(f"   Amount Due: {result[0]}, Amount Paid: {result[1]}")
+            print(f"   → Payment Status: {result[2]} (Expected: Partially Paid)")
+        
+        # Test 3: Update to unpaid
+        print("\n3. Testing UPDATE trigger (Unpaid):")
+        cursor.execute("""
+            UPDATE Billing 
+            SET amount_paid = 0 
+            WHERE appointment_id = 90
+        """)
+        connection.commit()
+        
+        cursor.execute("SELECT amount_due, amount_paid, payment_status FROM Billing WHERE appointment_id = 90")
+        result = cursor.fetchone()
+        if result:
+            print(f"   Amount Due: {result[0]}, Amount Paid: {result[1]}")
+            print(f"   → Payment Status: {result[2]} (Expected: Unpaid)")
+        
+        # Cleanup test data
+        cursor.execute("DELETE FROM Billing WHERE appointment_id = 90")
+        connection.commit()
+        print("\n✓ Trigger test completed (test data cleaned up)")
+        
+        cursor.close()
+    except Exception as e:
+        print(f"✗ Error testing triggers: {e}")
+
+def verify_database_objects(connection):
+    """Verify that all views, procedures, and triggers exist"""
+    print("\n" + "="*80)
+    print("DATABASE OBJECTS VERIFICATION")
+    print("="*80)
+    
+    try:
+        cursor = connection.cursor()
+        
+        # Check Views
+        print("\n📊 VIEWS:")
+        cursor.execute("""
+            SELECT TABLE_NAME 
+            FROM INFORMATION_SCHEMA.VIEWS 
+            WHERE TABLE_SCHEMA = 'hospital_manager'
+            ORDER BY TABLE_NAME
+        """)
+        views = cursor.fetchall()
+        if views:
+            for i, view in enumerate(views, 1):
+                print(f"   {i}. {view[0]}")
+        else:
+            print("   ✗ No views found")
+        
+        # Check Stored Procedures
+        print("\n⚙️  STORED PROCEDURES:")
+        cursor.execute("""
+            SELECT ROUTINE_NAME 
+            FROM INFORMATION_SCHEMA.ROUTINES 
+            WHERE ROUTINE_SCHEMA = 'hospital_manager' 
+            AND ROUTINE_TYPE = 'PROCEDURE'
+            ORDER BY ROUTINE_NAME
+        """)
+        procedures = cursor.fetchall()
+        if procedures:
+            for i, proc in enumerate(procedures, 1):
+                print(f"   {i}. {proc[0]}")
+        else:
+            print("   ✗ No procedures found")
+        
+        # Check Triggers
+        print("\n🔔 TRIGGERS:")
+        cursor.execute("""
+            SELECT TRIGGER_NAME, EVENT_MANIPULATION, EVENT_OBJECT_TABLE
+            FROM INFORMATION_SCHEMA.TRIGGERS 
+            WHERE TRIGGER_SCHEMA = 'hospital_manager'
+            ORDER BY TRIGGER_NAME
+        """)
+        triggers = cursor.fetchall()
+        if triggers:
+            for i, trig in enumerate(triggers, 1):
+                print(f"   {i}. {trig[0]} ({trig[1]} on {trig[2]})")
+        else:
+            print("   ✗ No triggers found")
+        
+        print(f"\n✓ Total: {len(views)} views, {len(procedures)} procedures, {len(triggers)} triggers")
+        cursor.close()
+    except Exception as e:
+        print(f"✗ Error verifying database objects: {e}")
+
 def main():
     print("\n" + "="*80)
     print("HOSPITAL PATIENT MANAGER")
@@ -448,13 +571,19 @@ def main():
         return
     
     try:
-        print("### QUERYING VIEWS ###\n")
+        # Verify database objects first
+        verify_database_objects(connection)
+        
+        print("\n\n### QUERYING VIEWS ###\n")
         df_revenue = query_view_department_revenue(connection)
         df_appointments = query_view_patient_appointments(connection, limit=10)
         df_unpaid = query_view_unpaid_bills(connection)
         
         print("\n\n### CALLING STORED PROCEDURES ###\n")
         df_monthly = call_procedure_monthly_revenue(connection, year=2025, month=11)
+        
+        # Test triggers
+        test_triggers(connection)
         
         print("\n\n### CUSTOM SQL QUERIES ###\n")
         df_dept_stats = custom_query_department_stats(connection)
