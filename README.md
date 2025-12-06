@@ -2,26 +2,166 @@
 
 A comprehensive hospital management system built with Python and MySQL.
 
+## Team Information
+
+**Team 7 Members:**
+- Nguyen Tuan Anh - 11247260
+- Tran Tuan Anh - 11247264
+- Tran Minh Hoang - 11247292
+- Vu Quoc Huy - 11247301
+
+**University:** National Economics University  
+**Faculty:** Data Science and Artificial Intelligence  
+**Class:** AI66A
+
+**Presentation Video:** https://www.youtube.com/watch?v=kpDl7LHAD3g
+
 ## Features
 
-- Complete MySQL Database: 7 normalized tables, 3 views, 2 procedures, 2 triggers
-- Python Application with auto-initialization
-- Web Interface: Flask dashboard
-- Data Visualization: Automated charts
-- November 2025 sample data included
+- **MySQL Database**: 7 normalized tables (3NF)
+- **3 Views**: Revenue reports, patient appointments, unpaid bills
+- **2 Stored Procedures**: Create appointments, monthly revenue reports
+- **2 Triggers**: Auto-update payment status
+- **Python Program**: Database connection with data visualization
+- **Flask Web Interface**: Complete CRUD operations
+
+## Project Structure
+
+```
+hospital-patient-manager/
+
+ app/                          # Main source code
+    db/                       # Database module
+       schema.sql            # 7 table definitions
+       seed.sql              # Sample data
+       views_procedures.sql  # Views, procedures, triggers
+       connection.py         # Database connection
+    models/                   # Data models (CRUD operations)
+    queries/                  # SQL queries (JOIN operations)
+    services/                 # Business logic
+    ui/                       # Flask web interface
+       templates/            # HTML templates
+       static/               # CSS, JavaScript
+    main.py                   # Main Python program
+
+ charts/                       # Auto-generated visualizations
+ docs/                         # Report and slides
+ .env                          # Configuration (not in Git)
+ requirements.txt              # Python dependencies
+ run.py                        # Flask app entry point
+```
 
 ## Quick Start
 
-1. Install: `pip install -r requirements.txt`
-2. Configure `.env` with MySQL password
-3. Run: `python app/main.py`
+### 1. System Requirements
 
-Database initializes automatically!
+- **Python 3.8+**
+- **MySQL 8.0+**
 
-## Technology
+### 2. Install Dependencies
 
-MySQL 8.0 | Python 3.x | PyMySQL | Pandas | Matplotlib | Flask
+```bash
+pip install -r requirements.txt
+```
 
-## License
+### 3. Setup Database
 
-MIT - Educational use
+```bash
+# Login to MySQL
+mysql -u root -p
+
+# Create database
+CREATE DATABASE hospital_manager;
+exit;
+
+# Import SQL files
+mysql -u root -p hospital_manager < app/db/schema.sql
+mysql -u root -p hospital_manager < app/db/seed.sql
+mysql -u root -p hospital_manager < app/db/views_procedures.sql
+```
+or just run the sql file in folder db
+### 4. Configure Environment
+
+Create .env file bu .env.examples ( please to use your password )
+
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=hospital_manager
+FLASK_ENV=development
+SECRET_KEY=your-secret-key
+```
+
+### 5. Run Application
+
+**Python Program:**
+```bash
+python app/main.py
+```
+
+**Output:**
+- Console displays data from Views, Procedures, and custom queries
+- 4 PNG chart files created in the `charts/` folder:
+  - `department_revenue.png` - Bar chart of revenue by department
+  - `monthly_revenue_trend.png` - Line chart of revenue trends
+  - `doctor_performance.png` - Horizontal bar chart of doctor performance
+  - `appointment_status.png` - Pie chart of appointment status distribution
+
+**Web Interface:**
+```bash
+python run.py
+```
+Then open the web link that on your cmd screen.
+
+## Web Application (Flask)
+
+**Files:** `run.py`, `app/ui/`
+
+### Features
+
+#### Dashboard (`/`)
+- Display KPIs: Total patients, doctors, appointments, revenue
+- Appointments per day chart (30 days)
+- Specialization distribution chart
+- Recent activities
+
+#### Patient Management (`/patients`)
+- List all patients
+- Search by name
+- Add new patient
+- Edit patient information
+- Delete patient (with confirmation)
+- View details and medical history
+
+#### Doctor Management (`/doctors`)
+- List doctors by department
+- Add/edit/delete doctors
+- View work schedule
+- Performance statistics
+
+#### Appointment Management (`/appointments`)
+- Create new appointment
+- View calendar by day/week/month
+- Update status (Scheduled/Completed/Cancelled)
+- Cancel appointment
+
+#### Reports (`/reports`)
+- Revenue reports
+- Outstanding bills report
+- Patient statistics
+- Export to CSV
+
+## Technology Stack
+
+- **MySQL 8.0** - Database Management System
+- **Python 3.12** - Programming Language
+- **PyMySQL 1.1.2** - MySQL Connector
+- **Flask 3.1.2** - Web Framework
+- **Pandas 2.3.0** - Data Manipulation
+- **Matplotlib 3.10.3** - Data Visualization
+- **Seaborn 0.13.2** - Statistical Visualization
+
+
+
