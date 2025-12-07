@@ -192,15 +192,6 @@ with open('app/models/patients.sql', 'r', encoding='utf-8') as f:
 - Patient statistics
 - Export to CSV
 
-## Technology Stack
-
-- **MySQL 8.0** - Database Management System
-- **Python 3.12** - Programming Language
-- **PyMySQL 1.1.2** - MySQL Connector
-- **Flask 3.1.2** - Web Framework
-- **Pandas 2.3.0** - Data Manipulation
-- **Matplotlib 3.10.3** - Data Visualization
-- **Seaborn 0.13.2** - Statistical Visualization
 
 
 
