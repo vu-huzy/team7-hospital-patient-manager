@@ -1,5 +1,8 @@
 USE hospital_manager;
 
+-- ===========================
+-- 1. DEPARTMENT
+-- ===========================
 INSERT INTO Department (department_name, location, head_of_department)
 VALUES
 ('Cardiology', 'Building A', 'Dr. Nguyen Van Hoang'),
@@ -8,6 +11,9 @@ VALUES
 ('Orthopedics', 'Building D', 'Dr. Pham Van Thanh'),
 ('Dermatology', 'Building E', 'Dr. Hoang Thi Lan');
 
+-- ===========================
+-- 2. DOCTOR
+-- ===========================
 INSERT INTO Doctor (full_name, specialization, phone_number, email, department_id)
 VALUES
 ('Dr. Nguyen Quang Anh', 'Cardiology', '0905111222', 'anh.nguyen@hospital.com', 1),
@@ -24,7 +30,7 @@ VALUES
 
 
 -- ===========================
--- 3. PATIENT (20 records)
+-- 3. PATIENT
 -- ===========================
 INSERT INTO Patient (full_name, gender, date_of_birth, phone_number, email, address, emergency_contact)
 VALUES
@@ -54,6 +60,10 @@ VALUES
 ('Ngo Thi Xuan', 'Female', '1991-06-18', '0912000024', 'xuan.ngo@mail.com', '34 Dien Bien Phu, Da Nang', '0903000024'),
 ('Dinh Van Yen', 'Male', '1986-03-25', '0912000025', 'yen.dinh@mail.com', '56 Tay Son, Ha Noi', '0903000025');
 
+
+-- ===========================
+-- 4. APPOINTMENT
+-- ===========================
 INSERT INTO Appointment (patient_id, doctor_id, appointment_date, reason, status)
 VALUES
 (1, 1, '2025-01-05 09:00:00', 'Chest pain', 'Completed'),
@@ -151,6 +161,10 @@ VALUES
 (14, 3, '2025-12-04 09:00:00', 'Brain MRI follow-up', 'Scheduled'),
 (15, 4, '2025-12-05 11:00:00', 'Vertigo treatment', 'Scheduled');
 
+
+-- ===========================
+-- 5. MEDICAL RECORD
+-- ===========================
 INSERT INTO Medical_Record (appointment_id, diagnosis, prescription, treatment_notes, follow_up_date)
 VALUES
 (1, 'Chest pain', 'Paracetamol', 'Rest 3 days', '2025-01-12'),
@@ -229,6 +243,10 @@ VALUES
 (84, 'Alzheimer disease', 'Memantine', 'Caregiver support', '2025-12-29'),
 (85, 'Diabetic neuropathy', 'Pregabalin', 'Blood sugar control', '2025-12-09');
 
+
+-- ===========================
+-- 6. BILLING
+-- ===========================
 INSERT INTO Billing (patient_id, appointment_id, amount_due, amount_paid, payment_date, payment_status, payment_method)
 VALUES
 (1, 1, 300000, 300000, '2025-01-05', 'Paid', 'cash'),
@@ -321,6 +339,10 @@ VALUES
 (9, 88, 340000, 340000, '2025-11-30', 'Paid', 'card'),
 (10, 89, 210000, 210000, '2025-11-30', 'Paid', 'cash');
 
+
+-- ===========================
+-- 7. STAFF
+-- ===========================
 INSERT INTO Staff (full_name, position, phone_number, email, assigned_department)
 VALUES
 ('Nguyen Thanh Hai', 'Receptionist', '0912333000', 'hai.nguyen@hospital.com', 1),

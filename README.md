@@ -16,12 +16,15 @@ A comprehensive hospital management system built with Python and MySQL.
 
 **Presentation Video:** https://www.youtube.com/watch?v=kpDl7LHAD3g
 
+**Github Link :** https://github.com/vu-huzy/team7-hospital-patient-manager
+
 ## Features
 
 - **MySQL Database**: 7 normalized tables (3NF)
 - **3 Views**: Revenue reports, patient appointments, unpaid bills
 - **2 Stored Procedures**: Create appointments, monthly revenue reports
 - **2 Triggers**: Auto-update payment status
+- **Standalone SQL Files**: CRUD operations and reporting queries (can run independently)
 - **Python Program**: Database connection with data visualization
 - **Flask Web Interface**: Complete CRUD operations
 
@@ -36,13 +39,19 @@ hospital-patient-manager/
        seed.sql              # Sample data
        views_procedures.sql  # Views, procedures, triggers
        connection.py         # Database connection
-    models/                   # Data models (CRUD operations)
-    queries/                  # SQL queries (JOIN operations)
+    models/                   # SQL CRUD operations (standalone)
+       patients.sql          # Patient CRUD queries
+       doctors.sql           # Doctor CRUD queries
+       appointments.sql      # Appointment CRUD queries
+    queries/                  # SQL reporting queries (standalone)
+       inner_join.sql        # Patient treatments (INNER JOIN)
+       left_join.sql         # All patients (LEFT JOIN)
+       multi_join.sql        # Multi-table analysis
+       high_cost.sql         # High-cost treatment analysis
     services/                 # Business logic
     ui/                       # Flask web interface
        templates/            # HTML templates
        static/               # CSS, JavaScript
-
  charts/                       # Auto-generated visualizations
  docs/                         # Report and slides
  .env                          # Configuration (not in Git)
@@ -97,7 +106,53 @@ python main.py
 ```bash
 python run_web.py
 ```
-Then open the web link that on your cmd screen.
+Then open the web link that on your cmd screen. 
+http://127.0.0.1:5000
+
+## Standalone SQL Files
+
+All database queries are available as **standalone SQL files** that can be executed independently without Python.
+
+### SQL Files Location
+
+- **CRUD Operations**: `app/models/*.sql`
+  - `patients.sql` - 9 patient management queries
+  - `doctors.sql` - 10 doctor management queries  
+  - `appointments.sql` - 12 appointment management queries
+
+- **Reporting Queries**: `app/queries/*.sql`
+  - `inner_join.sql` - 4 INNER JOIN queries (patient treatments)
+  - `left_join.sql` - 5 LEFT JOIN queries (all patients including inactive)
+  - `multi_join.sql` - 5 complex multi-table queries
+  - `high_cost.sql` - 6 high-cost treatment analysis queries
+
+### How to Use SQL Files
+
+**Method 1: MySQL Command Line**
+```bash
+# Execute entire file
+mysql -u root -p hospital_manager < app/models/patients.sql
+
+# Execute specific query
+mysql -u root -p hospital_manager -e "SELECT * FROM Patient LIMIT 5;"
+```
+
+**Method 2: MySQL Workbench**
+1. Open MySQL Workbench and connect to database
+2. Open SQL file: File → Open SQL Script → Select `app/models/patients.sql`
+3. Select specific queries you want to run
+4. Click Execute button (⚡) or press Ctrl+Shift+Enter
+
+**Method 3: Python Integration**
+```python
+# Read and execute SQL file in Python
+with open('app/models/patients.sql', 'r', encoding='utf-8') as f:
+    queries = f.read().split(';')
+    for query in queries:
+        if query.strip():
+            cursor.execute(query)
+```
+
 
 ## Web Application (Flask)
 
