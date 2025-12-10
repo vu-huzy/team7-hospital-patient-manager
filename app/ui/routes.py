@@ -44,7 +44,7 @@ def list_patients():
     """List all patients"""
     try:
         search_term = request.args.get('search', '')
-        patient_list = sql_helpers.list_patients(search=search_term if search_term else None)
+        patient_list = sql_loader.list_patients(search=search_term if search_term else None)
         return render_template('patients.html', 
                              patients=patient_list,
                              search_term=search_term)
@@ -56,13 +56,13 @@ def list_patients():
 def view_patient(patient_id):
     """View single patient details"""
     try:
-        patient = sql_helpers.get_patient(patient_id)
+        patient = sql_loader.get_patient(patient_id)
         if not patient:
             flash('Patient not found', 'warning')
             return redirect(url_for('main.list_patients'))
         
         # Get patient's appointments
-        patient_appointments = sql_helpers.list_appointments(
+        patient_appointments = sql_loader.list_appointments(
             filters={'patient_id': patient_id}
         )
         
@@ -87,7 +87,7 @@ def create_patient():
             'emergency_contact': request.form.get('emergency_contact', '').strip()
         }
         
-        patient_id = sql_helpers.create_patient(data)
+        patient_id = sql_loader.create_patient(data)
         flash(f'Patient created successfully! ID: {patient_id}', 'success')
         
     except ValueError as e:
@@ -114,7 +114,7 @@ def update_patient(patient_id):
         # Remove empty values
         data = {k: v for k, v in data.items() if v}
         
-        rows = sql_helpers.update_patient(patient_id, data)
+        rows = sql_loader.update_patient(patient_id, data)
         if rows > 0:
             flash('Patient updated successfully!', 'success')
         else:
@@ -131,7 +131,7 @@ def update_patient(patient_id):
 def delete_patient(patient_id):
     """Delete patient"""
     try:
-        rows = sql_helpers.delete_patient(patient_id)
+        rows = sql_loader.delete_patient(patient_id)
         if rows > 0:
             flash('Patient deleted successfully!', 'success')
         else:
@@ -151,8 +151,8 @@ def list_doctors():
     """List all doctors"""
     try:
         search_term = request.args.get('search', '')
-        doctor_list = sql_helpers.list_doctors(search=search_term if search_term else None)
-        departments = sql_helpers.list_departments()
+        doctor_list = sql_loader.list_doctors(search=search_term if search_term else None)
+        departments = sql_loader.list_departments()
         
         return render_template('doctors.html',
                              doctors=doctor_list,
@@ -166,13 +166,13 @@ def list_doctors():
 def view_doctor(doctor_id):
     """View single doctor details"""
     try:
-        doctor = sql_helpers.get_doctor(doctor_id)
+        doctor = sql_loader.get_doctor(doctor_id)
         if not doctor:
             flash('Doctor not found', 'warning')
             return redirect(url_for('main.list_doctors'))
         
         # Get doctor's appointments
-        doctor_appointments = sql_helpers.list_appointments(
+        doctor_appointments = sql_loader.list_appointments(
             filters={'doctor_id': doctor_id}
         )
         
@@ -195,7 +195,7 @@ def create_doctor():
             'department_id': request.form.get('department_id') or None
         }
         
-        doctor_id = sql_helpers.create_doctor(data)
+        doctor_id = sql_loader.create_doctor(data)
         flash(f'Doctor created successfully! ID: {doctor_id}', 'success')
         
     except ValueError as e:
@@ -220,7 +220,7 @@ def update_doctor(doctor_id):
         # Remove empty values
         data = {k: v for k, v in data.items() if v}
         
-        rows = sql_helpers.update_doctor(doctor_id, data)
+        rows = sql_loader.update_doctor(doctor_id, data)
         if rows > 0:
             flash('Doctor updated successfully!', 'success')
         else:
@@ -237,7 +237,7 @@ def update_doctor(doctor_id):
 def delete_doctor(doctor_id):
     """Delete doctor"""
     try:
-        rows = sql_helpers.delete_doctor(doctor_id)
+        rows = sql_loader.delete_doctor(doctor_id)
         if rows > 0:
             flash('Doctor deleted successfully!', 'success')
         else:
@@ -268,9 +268,9 @@ def list_appointments():
         if request.args.get('end_date'):
             filters['end_date'] = request.args.get('end_date')
         
-        appointment_list = sql_helpers.list_appointments(filters=filters if filters else None)
-        doctor_list = sql_helpers.list_doctors()
-        patient_list = sql_helpers.list_patients()
+        appointment_list = sql_loader.list_appointments(filters=filters if filters else None)
+        doctor_list = sql_loader.list_doctors()
+        patient_list = sql_loader.list_patients()
         
         return render_template('appointments.html',
                              appointments=appointment_list,
@@ -305,7 +305,7 @@ def create_appointment():
             'amount_due': request.form.get('amount_due', '').strip()
         }
         
-        appointment_id = sql_helpers.create_appointment(data)
+        appointment_id = sql_loader.create_appointment(data)
         flash(f'Appointment created successfully! ID: {appointment_id}', 'success')
         
     except ValueError as e:
@@ -340,7 +340,7 @@ def update_appointment(appointment_id):
         if request.form.get('status'):
             data['status'] = request.form.get('status')
         
-        rows = sql_helpers.update_appointment(appointment_id, data)
+        rows = sql_loader.update_appointment(appointment_id, data)
         if rows > 0:
             flash('Appointment updated successfully!', 'success')
         else:
@@ -357,7 +357,7 @@ def update_appointment(appointment_id):
 def delete_appointment(appointment_id):
     """Delete appointment"""
     try:
-        rows = sql_helpers.delete_appointment(appointment_id)
+        rows = sql_loader.delete_appointment(appointment_id)
         if rows > 0:
             flash('Appointment deleted successfully!', 'success')
         else:
@@ -379,27 +379,27 @@ def reports():
         report_type = request.args.get('type', 'inner')
         
         if report_type == 'inner':
-            data = sql_helpers.get_patient_treatments()
-            summary = sql_helpers.get_patient_treatments_summary()
+            data = sql_loader.get_patient_treatments()
+            summary = sql_loader.get_patient_treatments_summary()
             title = "Patient Treatments (Inner Join)"
             description = "Shows all patients with completed treatments and billing"
         elif report_type == 'left':
-            data = sql_helpers.get_patients_with_optional_treatments()
-            summary = sql_helpers.get_patient_treatment_summary()
+            data = sql_loader.get_patients_with_optional_treatments()
+            summary = sql_loader.get_patient_treatment_summary()
             title = "All Patients with Optional Treatments (Left Join)"
             description = "Shows all patients, including those without appointments"
         elif report_type == 'multi':
-            data = sql_helpers.get_patient_doctor_treatments()
+            data = sql_loader.get_patient_doctor_treatments()
             summary = None
             title = "Complete Treatment Records (Multi-table Join)"
             description = "Comprehensive view across patients, doctors, departments, and billing"
         elif report_type == 'high_cost':
-            data = sql_helpers.get_high_cost_treatments()
-            summary = sql_helpers.get_cost_statistics()
+            data = sql_loader.get_high_cost_treatments()
+            summary = sql_loader.get_cost_statistics()
             title = "High Cost Treatments"
             description = "Treatment types with above-average costs"
         elif report_type == 'department':
-            data = sql_helpers.get_department_performance()
+            data = sql_loader.get_department_performance()
             summary = None
             title = "Department Performance"
             description = "Analysis of department metrics and revenue"
@@ -430,19 +430,19 @@ def export_report(report_type):
     try:
         # Get report data
         if report_type == 'inner':
-            data = sql_helpers.get_patient_treatments()
+            data = sql_loader.get_patient_treatments()
             filename = 'patient_treatments.csv'
         elif report_type == 'left':
-            data = sql_helpers.get_patients_with_optional_treatments()
+            data = sql_loader.get_patients_with_optional_treatments()
             filename = 'all_patients_treatments.csv'
         elif report_type == 'multi':
-            data = sql_helpers.get_patient_doctor_treatments()
+            data = sql_loader.get_patient_doctor_treatments()
             filename = 'complete_treatment_records.csv'
         elif report_type == 'high_cost':
-            data = sql_helpers.get_high_cost_treatments()
+            data = sql_loader.get_high_cost_treatments()
             filename = 'high_cost_treatments.csv'
         elif report_type == 'department':
-            data = sql_helpers.get_department_performance()
+            data = sql_loader.get_department_performance()
             filename = 'department_performance.csv'
         else:
             flash('Invalid report type', 'danger')
