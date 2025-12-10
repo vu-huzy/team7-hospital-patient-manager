@@ -1,12 +1,15 @@
 """
 Search and Filter service
 Global search and advanced filtering for appointments
+All queries loaded from SQL files to ensure consistency
 """
 from app.db.connection import get_connection
+from app.services.sql_query_loader import load_query_from_file
 
 def global_search(keyword):
     """
     Global search across patients, doctors, and appointments
+    Uses Query 1 from inner_join.sql (Patient treatments with costs)
     
     Searches in:
     - Patient names
@@ -26,35 +29,31 @@ def global_search(keyword):
     connection = get_connection()
     try:
         with connection.cursor() as cursor:
-            query = """
-                SELECT 
-                    a.appointment_id,
-                    a.appointment_date,
-                    a.status,
-                    a.reason,
-                    p.patient_id,
-                    p.full_name AS patient_name,
-                    p.phone_number AS patient_phone,
-                    d.doctor_id,
-                    d.full_name AS doctor_name,
-                    d.specialization AS treatment_type,
-                    b.amount_due AS cost,
-                    b.payment_status,
-                    'appointment' as result_type
-                FROM Appointment a
-                JOIN Patient p ON a.patient_id = p.patient_id
-                JOIN Doctor d ON a.doctor_id = d.doctor_id
-                LEFT JOIN Billing b ON a.appointment_id = b.appointment_id
+            # Load base query from inner_join.sql - Query 1
+            query = load_query_from_file('app/queries/inner_join.sql', 1)
+            
+            # Remove ORDER BY to add WHERE condition
+            if 'ORDER BY' in query:
+                base_query = query.split('ORDER BY')[0]
+                order_clause = 'ORDER BY ' + query.split('ORDER BY')[1]
+            else:
+                base_query = query
+                order_clause = 'ORDER BY a.appointment_date DESC'
+            
+            # Add search WHERE condition
+            base_query = base_query.rstrip(';').strip()
+            search_condition = """
                 WHERE 
                     p.full_name LIKE %s
                     OR d.full_name LIKE %s
                     OR d.specialization LIKE %s
                     OR a.reason LIKE %s
-                ORDER BY a.appointment_date DESC
-                LIMIT 100
             """
+            
+            full_query = base_query + search_condition + order_clause + " LIMIT 100"
+            
             search_pattern = f"%{keyword.strip()}%"
-            cursor.execute(query, (search_pattern, search_pattern, search_pattern, search_pattern))
+            cursor.execute(full_query, (search_pattern, search_pattern, search_pattern, search_pattern))
             results = cursor.fetchall()
             
             # Convert Decimal to float

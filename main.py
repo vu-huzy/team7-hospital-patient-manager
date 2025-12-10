@@ -233,26 +233,29 @@ def call_procedure_monthly_revenue(connection, year=2025, month=11):
 
 def custom_query_department_stats(connection):
     print("\n" + "="*80)
-    print("CUSTOM QUERY: Department Statistics")
+    print("CUSTOM QUERY: Department Statistics (from multi_join.sql Query 2)")
     print("="*80)
     
     try:
-        query = """
-        SELECT 
-            d.department_name,
-            d.location,
-            COUNT(DISTINCT doc.doctor_id) AS total_doctors,
-            COUNT(DISTINCT a.appointment_id) AS total_appointments,
-            COUNT(DISTINCT a.patient_id) AS unique_patients,
-            SUM(CASE WHEN a.status = 'Completed' THEN 1 ELSE 0 END) AS completed,
-            SUM(CASE WHEN a.status = 'Scheduled' THEN 1 ELSE 0 END) AS scheduled,
-            SUM(CASE WHEN a.status = 'Cancelled' THEN 1 ELSE 0 END) AS cancelled
-        FROM Department d
-        LEFT JOIN Doctor doc ON d.department_id = doc.department_id
-        LEFT JOIN Appointment a ON doc.doctor_id = a.doctor_id
-        GROUP BY d.department_id, d.department_name, d.location
-        ORDER BY total_appointments DESC
-        """
+        # Load from multi_join.sql - Query 2: Department performance with all metrics
+        with open('app/queries/multi_join.sql', 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Extract Query 2 (Department performance)
+        queries = content.split('-- Query')
+        query = None
+        for q in queries:
+            if q.strip().startswith('2:'):
+                # Remove comment line and get SQL
+                lines = q.split('\n')[1:]
+                query = '\n'.join(lines).strip()
+                # Remove any trailing query separator
+                if '-- Query' in query:
+                    query = query.split('-- Query')[0].strip()
+                break
+        
+        if not query:
+            raise Exception("Could not find Query 2 in multi_join.sql")
         
         df = pd.read_sql(query, connection)
         if df.empty:
@@ -267,28 +270,29 @@ def custom_query_department_stats(connection):
 
 def custom_query_doctor_performance(connection):
     print("\n" + "="*80)
-    print("CUSTOM QUERY: Doctor Performance Report")
+    print("CUSTOM QUERY: Doctor Performance Report (from multi_join.sql Query 3)")
     print("="*80)
     
     try:
-        query = """
-        SELECT 
-            doc.doctor_id,
-            doc.full_name AS doctor_name,
-            doc.specialization,
-            dept.department_name,
-            COUNT(DISTINCT a.appointment_id) AS total_appointments,
-            COUNT(DISTINCT a.patient_id) AS unique_patients,
-            SUM(b.amount_due) AS total_revenue_generated,
-            SUM(b.amount_paid) AS total_collected,
-            AVG(b.amount_due) AS avg_billing_amount
-        FROM Doctor doc
-        LEFT JOIN Department dept ON doc.department_id = dept.department_id
-        LEFT JOIN Appointment a ON doc.doctor_id = a.doctor_id
-        LEFT JOIN Billing b ON a.appointment_id = b.appointment_id
-        GROUP BY doc.doctor_id, doc.full_name, doc.specialization, dept.department_name
-        ORDER BY total_appointments DESC
-        """
+        # Load from multi_join.sql - Query 3: Doctor performance with patient outcomes
+        with open('app/queries/multi_join.sql', 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Extract Query 3 (Doctor performance)
+        queries = content.split('-- Query')
+        query = None
+        for q in queries:
+            if q.strip().startswith('3:'):
+                # Remove comment line and get SQL
+                lines = q.split('\n')[1:]
+                query = '\n'.join(lines).strip()
+                # Remove any trailing query separator
+                if '-- Query' in query:
+                    query = query.split('-- Query')[0].strip()
+                break
+        
+        if not query:
+            raise Exception("Could not find Query 3 in multi_join.sql")
         
         df = pd.read_sql(query, connection)
         if df.empty:
@@ -402,6 +406,79 @@ def visualize_doctor_performance(df_doctor):
         print(f"✓ Chart saved: {filename}")
     except Exception as e:
         print(f"✗ Error: {e}")
+def query_high_cost_treatments(connection):
+    """Query high cost treatments from high_cost.sql"""
+    print("\n" + "="*80)
+    print("CUSTOM QUERY: High Cost Treatments (from high_cost.sql Query 1)")
+    print("="*80)
+    
+    try:
+        # Load from high_cost.sql - Query 1: High cost treatments
+        with open('app/queries/high_cost.sql', 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Extract Query 1
+        queries = content.split('-- Query')
+        query = None
+        for q in queries:
+            if q.strip().startswith('1:'):
+                lines = q.split('\n')[1:]
+                query = '\n'.join(lines).strip()
+                if '-- Query' in query:
+                    query = query.split('-- Query')[0].strip()
+                break
+        
+        if not query:
+            raise Exception("Could not find Query 1 in high_cost.sql")
+        
+        df = pd.read_sql(query, connection)
+        if df.empty:
+            print("No high cost treatments found.")
+            return None
+        
+        print(df.to_string(index=False))
+        print(f"\nTotal High Cost Treatments: {len(df)}")
+        return df
+    except Exception as e:
+        print(f"✗ Error: {e}")
+        return None
+
+def query_patient_treatments(connection):
+    """Query patient treatments from inner_join.sql"""
+    print("\n" + "="*80)
+    print("CUSTOM QUERY: Patient Treatments (from inner_join.sql Query 1)")
+    print("="*80)
+    
+    try:
+        # Load from inner_join.sql - Query 1: Patient treatments with costs
+        with open('app/queries/inner_join.sql', 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Extract Query 1
+        queries = content.split('-- Query')
+        query = None
+        for q in queries:
+            if q.strip().startswith('1:'):
+                lines = q.split('\n')[1:]
+                query = '\n'.join(lines).strip()
+                if '-- Query' in query:
+                    query = query.split('-- Query')[0].strip()
+                break
+        
+        if not query:
+            raise Exception("Could not find Query 1 in inner_join.sql")
+        
+        df = pd.read_sql(query, connection)
+        if df.empty:
+            print("No patient treatments found.")
+            return None
+        
+        print(df.head(10).to_string(index=False))
+        print(f"\nTotal Patient Treatments: {len(df)}")
+        return df
+    except Exception as e:
+        print(f"✗ Error: {e}")
+        return None
 
 def visualize_appointment_status(connection):
     print("\n" + "="*80)
@@ -409,6 +486,7 @@ def visualize_appointment_status(connection):
     print("="*80)
     
     try:
+        # Simple query for visualization - not from file since it's just for chart
         query = "SELECT status, COUNT(*) AS count FROM Appointment GROUP BY status"
         df = pd.read_sql(query, connection)
         
@@ -586,8 +664,10 @@ def main():
         test_triggers(connection)
         
         print("\n\n### CUSTOM SQL QUERIES ###\n")
+        df_patient_treatments = query_patient_treatments(connection)
         df_dept_stats = custom_query_department_stats(connection)
         df_doctor_perf = custom_query_doctor_performance(connection)
+        df_high_cost = query_high_cost_treatments(connection)
         
         print("\n\n### DATA VISUALIZATION ###\n")
         visualize_department_revenue(df_revenue)

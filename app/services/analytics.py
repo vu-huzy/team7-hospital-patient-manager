@@ -1,7 +1,9 @@
 """
 Analytics service - KPIs and dashboard data
+All queries loaded from SQL files to ensure consistency
 """
 from app.db.connection import get_connection
+from app.services.sql_query_loader import load_query_from_file
 from datetime import datetime, timedelta
 
 def get_kpis():
@@ -156,6 +158,7 @@ def get_revenue_per_month(months=6):
 def get_specialization_distribution():
     """
     Get appointment distribution by specialization
+    Uses Query 4 from inner_join.sql (Treatments by specialization)
     
     Returns:
         List of dictionaries with specialization and count
@@ -163,24 +166,17 @@ def get_specialization_distribution():
     connection = get_connection()
     try:
         with connection.cursor() as cursor:
-            query = """
-                SELECT 
-                    d.specialization,
-                    COUNT(a.appointment_id) as appointment_count,
-                    COUNT(DISTINCT a.patient_id) as patient_count,
-                    COALESCE(SUM(b.amount_due), 0) as revenue
-                FROM Doctor d
-                LEFT JOIN Appointment a ON d.doctor_id = a.doctor_id
-                LEFT JOIN Billing b ON a.appointment_id = b.appointment_id
-                GROUP BY d.specialization
-                ORDER BY appointment_count DESC
-            """
+            # Load from inner_join.sql - Query 4: Treatments by specialization
+            query = load_query_from_file('app/queries/inner_join.sql', 4)
             cursor.execute(query)
             results = cursor.fetchall()
             
             # Convert Decimal to float
             for row in results:
-                row['revenue'] = float(row['revenue'])
+                if 'total_revenue' in row:
+                    row['total_revenue'] = float(row['total_revenue'])
+                if 'avg_cost' in row:
+                    row['avg_cost'] = float(row['avg_cost'])
             
             return results
     finally:
@@ -189,6 +185,7 @@ def get_specialization_distribution():
 def get_doctor_performance():
     """
     Get top performing doctors by appointments and revenue
+    Uses Query 3 from multi_join.sql (Doctor performance with patient outcomes)
     
     Returns:
         List of top doctors with performance metrics
@@ -196,29 +193,18 @@ def get_doctor_performance():
     connection = get_connection()
     try:
         with connection.cursor() as cursor:
-            query = """
-                SELECT 
-                    d.doctor_id,
-                    d.full_name as doctor_name,
-                    d.specialization,
-                    COUNT(a.appointment_id) as total_appointments,
-                    COUNT(DISTINCT a.patient_id) as unique_patients,
-                    COALESCE(SUM(b.amount_due), 0) as total_revenue,
-                    COALESCE(AVG(b.amount_due), 0) as avg_revenue_per_visit
-                FROM Doctor d
-                LEFT JOIN Appointment a ON d.doctor_id = a.doctor_id
-                LEFT JOIN Billing b ON a.appointment_id = b.appointment_id
-                GROUP BY d.doctor_id, d.full_name, d.specialization
-                ORDER BY total_appointments DESC
-                LIMIT 10
-            """
+            # Load from multi_join.sql - Query 3: Doctor performance
+            query = load_query_from_file('app/queries/multi_join.sql', 3)
+            # Limit to top 10
+            query += " LIMIT 10"
             cursor.execute(query)
             results = cursor.fetchall()
             
             # Convert Decimal to float
             for row in results:
-                row['total_revenue'] = float(row['total_revenue'])
-                row['avg_revenue_per_visit'] = float(row['avg_revenue_per_visit'])
+                row['total_revenue_generated'] = float(row.get('total_revenue_generated', 0))
+                row['total_collected'] = float(row.get('total_collected', 0))
+                row['avg_billing_per_visit'] = float(row.get('avg_billing_per_visit', 0))
             
             return results
     finally:
@@ -263,6 +249,7 @@ def get_payment_status_summary():
 def get_recent_activity(limit=10):
     """
     Get recent appointments for activity feed
+    Uses Query 1 from multi_join.sql (Complete patient treatment journey)
     
     Args:
         limit: Number of recent records to return
@@ -273,30 +260,19 @@ def get_recent_activity(limit=10):
     connection = get_connection()
     try:
         with connection.cursor() as cursor:
-            query = """
-                SELECT 
-                    a.appointment_id,
-                    a.appointment_date,
-                    a.status,
-                    p.full_name as patient_name,
-                    d.full_name as doctor_name,
-                    d.specialization,
-                    b.amount_due,
-                    b.payment_status
-                FROM Appointment a
-                JOIN Patient p ON a.patient_id = p.patient_id
-                JOIN Doctor d ON a.doctor_id = d.doctor_id
-                LEFT JOIN Billing b ON a.appointment_id = b.appointment_id
-                ORDER BY a.appointment_date DESC
-                LIMIT %s
-            """
+            # Load from multi_join.sql - Query 1: Complete patient journey
+            query = load_query_from_file('app/queries/multi_join.sql', 1)
+            # Add limit
+            query += " LIMIT %s"
             cursor.execute(query, (limit,))
             results = cursor.fetchall()
             
             # Convert Decimal to float
             for row in results:
-                if row['amount_due']:
+                if row.get('amount_due'):
                     row['amount_due'] = float(row['amount_due'])
+                if row.get('amount_paid'):
+                    row['amount_paid'] = float(row['amount_paid'])
             
             return results
     finally:
